@@ -1,8 +1,9 @@
 """Google ADK agent definition for SmartLogs."""
 
 from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
 
-from smartlogs.config import get_model_name
+from smartlogs.config import get_hf_api_key, get_model_name
 from smartlogs.tools import parse_log, classify_severity, format_analysis
 
 
@@ -24,7 +25,10 @@ Format your final response clearly with sections for each part of the analysis.
 
 def create_agent() -> Agent:
     """Create and return the SmartLogs analysis agent."""
-    model = get_model_name()
+    model_name = get_model_name()
+    api_key = get_hf_api_key()
+
+    model = LiteLlm(model=model_name, api_key=api_key)
 
     agent = Agent(
         name="smartlogs_analyzer",
