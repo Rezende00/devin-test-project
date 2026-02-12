@@ -1,0 +1,10 @@
+2024-01-15T08:30:00 INFO: Server started on port 8080
+2024-01-15T08:30:01 INFO: Connected to database at localhost:5432
+2024-01-15T08:32:15 WARNING: Slow query detected (2340ms): SELECT * FROM users WHERE last_login < '2023-01-01'
+2024-01-15T08:45:22 ERROR: Connection refused on port 6379 - Redis cache unavailable
+2024-01-15T08:45:23 WARNING: Falling back to in-memory cache
+2024-01-15T09:12:44 ERROR: Request timeout after 30s: POST /api/v1/reports/generate
+2024-01-15T09:15:00 INFO: Health check passed
+2024-01-15T10:03:18 CRITICAL: Out of memory - heap usage at 98% (7.8GB/8GB)
+2024-01-15T10:03:19 ERROR: GC overhead limit exceeded - unable to allocate 256MB
+2024-01-15T10:03:20 FATAL: Server shutting down due to memory exhaustion

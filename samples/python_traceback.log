@@ -1,0 +1,21 @@
+ERROR: Unhandled exception in request handler
+Traceback (most recent call last):
+  File "/app/server.py", line 142, in handle_request
+    response = process_payment(order_id=12345)
+  File "/app/payments.py", line 89, in process_payment
+    result = gateway.charge(amount=order.total, currency="USD")
+  File "/app/gateway.py", line 34, in charge
+    raise ConnectionError("Payment gateway timeout after 30s")
+ConnectionError: Payment gateway timeout after 30s
+
+WARNING: Deprecated API endpoint called: GET /api/v1/users (use /api/v2/users)
+INFO: Background job completed: cleanup_expired_sessions (removed 1,247 sessions)
+
+ERROR: Database integrity error
+Traceback (most recent call last):
+  File "/app/models.py", line 67, in save_user
+    db.session.commit()
+  File "/lib/sqlalchemy/session.py", line 1451, in commit
+    self._flush()
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "users_email_key"
+DETAIL: Key (email)=(john@example.com) already exists.

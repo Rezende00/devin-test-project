@@ -1,0 +1,17 @@
+ERROR: NullPointerException in UserService
+java.lang.NullPointerException: Cannot invoke method getEmail() on null reference
+	at com.app.service.UserService.sendWelcomeEmail(UserService.java:89)
+	at com.app.service.UserService.registerUser(UserService.java:45)
+	at com.app.controller.AuthController.register(AuthController.java:67)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:897)
+
+WARNING: Connection pool exhausted - all 50 connections in use, 12 requests queued
+INFO: Scheduled task completed: daily_report_generation (duration: 45.2s)
+
+ERROR: StackOverflowError in recursive category lookup
+java.lang.StackOverflowError
+	at com.app.model.Category.getParent(Category.java:34)
+	at com.app.model.Category.getFullPath(Category.java:41)
+	at com.app.model.Category.getFullPath(Category.java:41)
+	at com.app.model.Category.getFullPath(Category.java:41)

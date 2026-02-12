@@ -1,5 +1,7 @@
 """CLI entry point for SmartLogs."""
 
+import asyncio
+
 import click
 from dotenv import load_dotenv
 
@@ -16,11 +18,11 @@ APP_NAME = "smartlogs"
 USER_ID = "cli_user"
 
 
-def run_agent(log_entry: str) -> str:
+async def _run_agent_async(log_entry: str) -> str:
     """Run the SmartLogs agent on a log entry and return the response."""
     agent = create_agent()
     session_service = InMemorySessionService()
-    session = session_service.create_session(
+    session = await session_service.create_session(
         app_name=APP_NAME,
         user_id=USER_ID,
     )
@@ -37,7 +39,7 @@ def run_agent(log_entry: str) -> str:
     )
 
     final_response = ""
-    for event in runner.run(
+    async for event in runner.run_async(
         user_id=USER_ID,
         session_id=session.id,
         new_message=user_message,
@@ -48,6 +50,11 @@ def run_agent(log_entry: str) -> str:
                     final_response += part.text
 
     return final_response
+
+
+def run_agent(log_entry: str) -> str:
+    """Synchronous wrapper for the async agent runner."""
+    return asyncio.run(_run_agent_async(log_entry))
 
 
 @click.group()

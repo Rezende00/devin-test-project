@@ -1,0 +1,10 @@
+2024-01-15T12:00:00Z INFO: Pod api-server-7d8f9b6c4-x2k9m started successfully
+2024-01-15T12:00:05Z INFO: Readiness probe passed for api-server-7d8f9b6c4-x2k9m
+2024-01-15T12:15:30Z WARNING: Pod worker-5c8d7e9f2-m3n4p memory usage at 85% (850Mi/1Gi)
+2024-01-15T12:20:45Z ERROR: CrashLoopBackOff for pod celery-beat-6a7b8c9d0-q5r6s - restarted 5 times
+2024-01-15T12:20:46Z ERROR: Container celery-beat exited with code 137 (OOMKilled)
+2024-01-15T12:25:00Z WARNING: Horizontal Pod Autoscaler unable to scale: max replicas (10) reached
+2024-01-15T12:30:15Z CRITICAL: Node ip-10-0-1-42 NotReady - disk pressure detected
+2024-01-15T12:30:16Z WARNING: Evicting pods from node ip-10-0-1-42 due to disk pressure
+2024-01-15T12:35:00Z INFO: Node ip-10-0-1-42 recovered - disk usage back to 72%
+2024-01-15T12:40:22Z ERROR: ImagePullBackOff for pod ml-pipeline-init: registry.internal/ml-model:v2.3.1 not found

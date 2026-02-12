@@ -33,7 +33,22 @@ smartlogs analyze "ERROR: Connection refused on port 5432"
 
 # Analyze logs from a file
 smartlogs analyze-file errors.log
+
+# Try with the included sample files
+smartlogs analyze-file samples/web_server.log
+smartlogs analyze-file samples/kubernetes.log
+smartlogs analyze-file samples/python_traceback.log
+smartlogs analyze-file samples/java_stacktrace.log
 ```
+
+## Sample Logs
+
+The `samples/` directory contains realistic log files for testing:
+
+- **web_server.log** — HTTP server logs with slow queries, cache failures, and OOM
+- **python_traceback.log** — Python exceptions with full tracebacks
+- **kubernetes.log** — K8s pod events, OOMKilled, disk pressure, image pull errors
+- **java_stacktrace.log** — Java exceptions with stack traces (NPE, StackOverflow)
 
 ## Development
 

@@ -1,7 +1,6 @@
 """Google ADK agent definition for SmartLogs."""
 
 from google.adk.agents import Agent
-from google.adk.tools import google_search
 
 from smartlogs.config import get_model_name
 from smartlogs.tools import parse_log, classify_severity, format_analysis
@@ -12,12 +11,11 @@ AGENT_INSTRUCTION = """You are SmartLogs, an AI-powered error log analyzer.
 When given a log entry or error message, you must:
 1. Use the parse_log tool to extract structured information from the log
 2. Use the classify_severity tool to determine the severity level
-3. Search the internet using google_search for known solutions and context about the error
-4. Provide a detailed analysis including:
+3. Provide a detailed analysis including:
    - Error type classification
    - Root cause hypothesis
    - Step-by-step suggested fixes
-   - Links to relevant documentation or Stack Overflow answers
+   - References to relevant documentation or known solutions
 
 Always be concise but thorough. Prioritize actionable fixes.
 Format your final response clearly with sections for each part of the analysis.
@@ -36,7 +34,6 @@ def create_agent() -> Agent:
         tools=[
             parse_log,
             classify_severity,
-            google_search,
         ],
     )
     return agent
