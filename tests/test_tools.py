@@ -29,10 +29,24 @@ class TestParseLog:
         assert result["severity"] == "UNKNOWN"
 
     def test_parse_multiline_stacktrace(self):
-        """This test documents the known bug: parser only handles single-line logs."""
         multiline = "ERROR: NullPointerException\n  at com.app.Main.run(Main.java:42)\n  at com.app.Main.main(Main.java:10)"
         result = parse_log(multiline)
         assert result["severity"] == "ERROR"
+        assert result["message"] == "NullPointerException"
+        assert len(result["stacktrace"]) == 2
+        assert "at com.app.Main.run(Main.java:42)" in result["stacktrace"][0]
+        assert "at com.app.Main.main(Main.java:10)" in result["stacktrace"][1]
+
+    def test_single_line_returns_empty_stacktrace(self):
+        result = parse_log("ERROR: Connection refused on port 5432")
+        assert result["stacktrace"] == []
+
+    def test_parse_python_traceback(self):
+        multiline = "ERROR: ValueError\n  File \"app.py\", line 10, in main\n    raise ValueError(\"bad\")\nValueError: bad"
+        result = parse_log(multiline)
+        assert result["severity"] == "ERROR"
+        assert result["message"] == "ValueError"
+        assert len(result["stacktrace"]) == 3
 
 
 class TestClassifySeverity:
