@@ -1,6 +1,7 @@
 """CLI entry point for SmartLogs."""
 
 import asyncio
+import logging
 
 import click
 from dotenv import load_dotenv
@@ -14,8 +15,25 @@ from smartlogs.tools import format_analysis
 
 load_dotenv()
 
+LOG_FORMAT = "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s"
+
 APP_NAME = "smartlogs"
 USER_ID = "cli_user"
+
+logger = logging.getLogger("smartlogs.cli")
+
+
+def setup_logging(verbose: bool = False) -> None:
+    """Configure logging for SmartLogs."""
+    level = logging.DEBUG if verbose else logging.INFO
+    root = logging.getLogger()
+    root.setLevel(level)
+    if not root.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter(LOG_FORMAT))
+        root.addHandler(handler)
+    for handler in root.handlers:
+        handler.setFormatter(logging.Formatter(LOG_FORMAT))
 
 
 async def _run_agent_async(log_entry: str) -> str:
@@ -59,9 +77,13 @@ def run_agent(log_entry: str) -> str:
 
 @click.group()
 @click.version_option(version="0.1.0")
-def main():
+@click.option("--verbose", "-v", is_flag=True, help="Enable debug logging output.")
+@click.pass_context
+def main(ctx: click.Context, verbose: bool) -> None:
     """SmartLogs - AI-powered error log analyzer."""
-    pass
+    setup_logging(verbose=verbose)
+    ctx.ensure_object(dict)
+    ctx.obj["verbose"] = verbose
 
 
 @main.command()
@@ -71,7 +93,7 @@ def analyze(log_entry: str):
 
     Example: smartlogs analyze "ERROR: Connection refused on port 5432"
     """
-    click.echo("Analyzing log entry...\n")
+    logger.info("Analyzing log entry...")
     result = run_agent(log_entry)
     click.echo(result)
 
@@ -83,10 +105,10 @@ def analyze_file(filepath: str):
     with open(filepath, "r") as f:
         lines = [line.strip() for line in f if line.strip()]
 
-    click.echo(f"Found {len(lines)} log entries. Analyzing...\n")
+    logger.info("Found %d log entries. Analyzing...", len(lines))
 
     for i, line in enumerate(lines, 1):
-        click.echo(f"--- Entry {i}/{len(lines)} ---")
+        logger.info("--- Entry %d/%d ---", i, len(lines))
         result = run_agent(line)
         click.echo(result)
         click.echo()

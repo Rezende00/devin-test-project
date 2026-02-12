@@ -1,6 +1,9 @@
 """Tools for the SmartLogs agent."""
 
+import logging
 import re
+
+logger = logging.getLogger("smartlogs.tools")
 
 
 def parse_log(log_entry: str) -> dict:
@@ -26,12 +29,14 @@ def parse_log(log_entry: str) -> dict:
     ts_match = re.search(timestamp_pattern, log_entry)
     timestamp = ts_match.group(0) if ts_match else None
 
-    return {
+    result = {
         "severity": severity,
         "message": message,
         "timestamp": timestamp,
         "raw": log_entry.strip(),
     }
+    logger.debug("Parsed log entry: severity=%s, timestamp=%s", severity, timestamp)
+    return result
 
 
 def classify_severity(log_entry: str) -> str:
@@ -45,12 +50,15 @@ def classify_severity(log_entry: str) -> str:
     """
     entry_upper = log_entry.upper()
     if "CRITICAL" in entry_upper or "FATAL" in entry_upper:
-        return "CRITICAL"
+        level = "CRITICAL"
     elif "ERROR" in entry_upper:
-        return "ERROR"
+        level = "ERROR"
     elif "WARN" in entry_upper:
-        return "WARNING"
-    return "INFO"
+        level = "WARNING"
+    else:
+        level = "INFO"
+    logger.debug("Classified severity as %s", level)
+    return level
 
 
 def format_analysis(analysis: dict) -> str:
