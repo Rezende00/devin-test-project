@@ -18,3 +18,12 @@ def get_google_api_key() -> str:
 def get_model_name() -> str:
     """Get the model name to use for the agent."""
     return os.environ.get("SMARTLOGS_MODEL", "gemini-2.5-flash")
+
+
+def get_max_retries() -> int:
+    """Get the maximum number of retries for transient API errors."""
+    value = os.environ.get("SMARTLOGS_MAX_RETRIES", "3")
+    try:
+        return max(0, int(value))
+    except (ValueError, TypeError):
+        return 3

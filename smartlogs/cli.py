@@ -1,19 +1,34 @@
 """CLI entry point for SmartLogs."""
 
+import time
+
 import click
 from dotenv import load_dotenv
 
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
+from google.api_core.exceptions import (
+    GoogleAPICallError,
+    TooManyRequests,
+    InternalServerError,
+    BadGateway,
+    ServiceUnavailable,
+    Unauthorized,
+    Forbidden,
+)
 from google.genai import types
 
 from smartlogs.agent import create_agent
+from smartlogs.config import get_max_retries
 from smartlogs.tools import format_analysis
 
 load_dotenv()
 
 APP_NAME = "smartlogs"
 USER_ID = "cli_user"
+
+RETRYABLE_EXCEPTIONS = (TooManyRequests, InternalServerError, BadGateway, ServiceUnavailable)
+NON_RETRYABLE_EXCEPTIONS = (Unauthorized, Forbidden)
 
 
 def run_agent(log_entry: str) -> str:
@@ -36,18 +51,37 @@ def run_agent(log_entry: str) -> str:
         parts=[types.Part(text=f"Analyze this error log:\n\n{log_entry}")],
     )
 
-    final_response = ""
-    for event in runner.run(
-        user_id=USER_ID,
-        session_id=session.id,
-        new_message=user_message,
-    ):
-        if event.is_final_response():
-            for part in event.content.parts:
-                if part.text:
-                    final_response += part.text
+    max_retries = get_max_retries()
+    last_exception: GoogleAPICallError | None = None
 
-    return final_response
+    for attempt in range(1, max_retries + 1):
+        try:
+            final_response = ""
+            for event in runner.run(
+                user_id=USER_ID,
+                session_id=session.id,
+                new_message=user_message,
+            ):
+                if event.is_final_response():
+                    for part in event.content.parts:
+                        if part.text:
+                            final_response += part.text
+            return final_response
+        except NON_RETRYABLE_EXCEPTIONS:
+            raise
+        except RETRYABLE_EXCEPTIONS as exc:
+            last_exception = exc
+            if attempt < max_retries:
+                backoff = 2 ** (attempt - 1)
+                click.echo(
+                    f"Retrying... (attempt {attempt + 1}/{max_retries}) "
+                    f"[waiting {backoff}s]"
+                )
+                time.sleep(backoff)
+
+    raise click.ClickException(
+        f"API call failed after {max_retries} attempts: {last_exception}"
+    )
 
 
 @click.group()
