@@ -1,0 +1,19 @@
+[project]
+name = "smartlogs"
+version = "0.1.0"
+description = "AI-powered error log analyzer using Google ADK agents"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "click>=8.1",
+    "google-adk>=1.0",
+    "python-dotenv>=1.0",
+]
+
+[project.scripts]
+smartlogs = "smartlogs.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
