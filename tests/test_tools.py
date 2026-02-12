@@ -29,10 +29,36 @@ class TestParseLog:
         assert result["severity"] == "UNKNOWN"
 
     def test_parse_multiline_stacktrace(self):
-        """This test documents the known bug: parser only handles single-line logs."""
         multiline = "ERROR: NullPointerException\n  at com.app.Main.run(Main.java:42)\n  at com.app.Main.main(Main.java:10)"
         result = parse_log(multiline)
         assert result["severity"] == "ERROR"
+        assert result["message"] == "NullPointerException"
+        assert len(result["stacktrace"]) == 2
+        assert "at com.app.Main.run(Main.java:42)" in result["stacktrace"][0]
+        assert "at com.app.Main.main(Main.java:10)" in result["stacktrace"][1]
+
+    def test_parse_python_traceback(self):
+        multiline = (
+            "ERROR: Unhandled exception in request handler\n"
+            "Traceback (most recent call last):\n"
+            '  File "/app/server.py", line 142, in handle_request\n'
+            "    response = process_payment(order_id=12345)\n"
+            'ConnectionError: Payment gateway timeout after 30s'
+        )
+        result = parse_log(multiline)
+        assert result["severity"] == "ERROR"
+        assert result["message"] == "Unhandled exception in request handler"
+        assert len(result["stacktrace"]) == 4
+        assert "Traceback (most recent call last):" in result["stacktrace"][0]
+        assert "ConnectionError" in result["stacktrace"][-1]
+
+    def test_single_line_returns_empty_stacktrace(self):
+        result = parse_log("ERROR: Connection refused on port 5432")
+        assert result["stacktrace"] == []
+
+    def test_single_line_info_returns_empty_stacktrace(self):
+        result = parse_log("INFO: Server started on port 8080")
+        assert result["stacktrace"] == []
 
 
 class TestClassifySeverity:

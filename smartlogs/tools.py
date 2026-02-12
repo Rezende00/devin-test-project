@@ -6,30 +6,43 @@ import re
 def parse_log(log_entry: str) -> dict:
     """Parse a log entry and extract structured information.
 
+    Handles both single-line log entries and multi-line stack traces.
+    For multi-line input the first line is parsed for severity/message and
+    remaining lines are collected into a ``stacktrace`` list.
+
     Args:
-        log_entry: Raw log string (e.g. "ERROR: Connection refused on port 5432")
+        log_entry: Raw log string, possibly containing newline-separated
+            stack trace frames.
 
     Returns:
         Dictionary with parsed fields: severity, message, timestamp (if present),
-        source (if present), and the raw log.
+        stacktrace (list of strings), and the raw log.
     """
+    lines = log_entry.strip().splitlines()
+    first_line = lines[0] if lines else ""
+
     severity_pattern = r"^(DEBUG|INFO|WARNING|WARN|ERROR|CRITICAL|FATAL)"
-    match = re.match(severity_pattern, log_entry.strip(), re.IGNORECASE)
+    match = re.match(severity_pattern, first_line.strip(), re.IGNORECASE)
 
     severity = match.group(1).upper() if match else "UNKNOWN"
-    message = log_entry.strip()
+    message = first_line.strip()
 
     if match:
-        message = log_entry[match.end():].strip().lstrip(":").strip()
+        message = first_line[match.end():].strip().lstrip(":").strip()
 
     timestamp_pattern = r"\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}"
-    ts_match = re.search(timestamp_pattern, log_entry)
+    ts_match = re.search(timestamp_pattern, first_line)
     timestamp = ts_match.group(0) if ts_match else None
+
+    stacktrace: list[str] = [
+        line.rstrip() for line in lines[1:] if line.strip()
+    ]
 
     return {
         "severity": severity,
         "message": message,
         "timestamp": timestamp,
+        "stacktrace": stacktrace,
         "raw": log_entry.strip(),
     }
 
