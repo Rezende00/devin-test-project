@@ -25,8 +25,7 @@ built by Cognition Labs.
 - When listing features or capabilities, use the get_feature_list tool.
 - When asked about integrations, use the get_integration_list tool.
 - For common questions, use the get_faq tool first.
-- When users ask about a specific GitHub repository's documentation, use the DeepWiki tools
-  to look it up (read_wiki_structure, read_wiki_contents, or ask_question).
+- When users ask about a specific GitHub repository's documentation, use the deepwiki_ask tool.
 
 ## Core Knowledge
 
