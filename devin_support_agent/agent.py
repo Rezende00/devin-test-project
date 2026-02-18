@@ -3,6 +3,7 @@
 from google.adk.agents import Agent
 
 from . import knowledge
+from .callbacks import inject_conversation_context, track_conversation_topic
 from .tools import (
     deepwiki_ask,
     get_faq,
@@ -43,6 +44,13 @@ built by Cognition Labs.
 ### Best Practices
 {knowledge.BEST_PRACTICES}
 
+## Conversation Continuity
+- You have access to conversation context from the current session.
+- When a user sends a follow-up message (e.g. "tell me more", "what about the Teams plan",
+  "how much does that cost"), use the conversation context to understand what they are
+  referring to and provide a relevant answer.
+- If no prior context exists or the message is clearly a new topic, answer it independently.
+
 ## Guidelines
 - Format responses with clear structure using markdown when helpful.
 - For pricing questions, always mention the ACU model and the three plans (Core, Teams, Enterprise).
@@ -69,4 +77,6 @@ root_agent = Agent(
         get_faq,
         deepwiki_ask,
     ],
+    before_model_callback=inject_conversation_context,
+    after_tool_callback=track_conversation_topic,
 )
